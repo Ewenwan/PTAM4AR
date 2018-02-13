@@ -1,0 +1,4 @@
+{
+	"Tracker.MiniPatchMaxSSD": 100000,
+    "Tracker.MaxInitialTrails": 1000
+}

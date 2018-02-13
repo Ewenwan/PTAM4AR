@@ -1,0 +1,209 @@
+commit 9dcbf8cfdec7ec7e59b57b9d27dd8a530bce0d00
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Tue Feb 13 10:35:03 2018 +0800
+
+    add .idea/ and *-build-* to .gitignore
+
+commit 4b6ef11166755e02163f4baef1c69ab805c7014e
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Tue Feb 13 10:32:25 2018 +0800
+
+    link_libraries( ${Sophus_LIBRARIES} Sophus )
+
+commit 62b74fc76602e7bd9a373ca639b90aa9fb66c7a0
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Tue Feb 13 10:30:54 2018 +0800
+
+    using std::stable_sort with Lambda expression instead of std::sort
+
+commit 9863b8d6cec04cc78e36020d825b36dd7bb3763a
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Sun Nov 5 18:01:59 2017 +0800
+
+    add PTAM_Develop_Schedule
+
+commit 893ad764582064e0854be3a25a684a08159c8347
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Sun Nov 5 17:55:10 2017 +0800
+
+    move README contents to LaTeX Notes
+
+commit 3ca13c02eb9efecff03af1cfff1aed4a26b3db49
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Fri Nov 3 18:57:35 2017 +0800
+
+    using std::stable_sort with Lambda expression instead of std::sort
+
+commit 5e01a5d04326e4d72f647efb4d9b165e4df209cb
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Fri Nov 3 18:29:41 2017 +0800
+
+    optimize code structure and add PatchFinder class and some methods
+
+commit 03c77e043b2d4c8c2524891258b6ab79e1f73b9e
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Fri Nov 3 10:30:33 2017 +0800
+
+    add config files using JsonCpp lib
+
+commit db786b991fdb512627de7166d9d5607a59576cc1
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Thu Nov 2 16:27:32 2017 +0800
+
+    test Homography methods and add Triangulate method to get 3D points
+
+commit da4b2a677455cbe2cca11d263af055fe87c8bd33
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Thu Nov 2 09:51:29 2017 +0800
+
+    solve logical problem for Homography
+
+commit b4c0bc91dea7078cd53b7b96c5bd062f12cb3580
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Thu Nov 2 09:44:51 2017 +0800
+
+    defined sort_compare method for std::sort
+
+commit 04ef89e2e90dd2cc26e3b597f3ada99692e7be49
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Wed Nov 1 18:00:47 2017 +0800
+
+    add some methods for class Homography
+
+commit 56d58ff5ed5f92098f80c5d88fecff647bd3e106
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Tue Oct 31 19:22:59 2017 +0800
+
+    add class Homography and its method HomographyFromMatches and TEST
+
+commit 47647e5cc1ea464c3b85f8dbe047e554cef11c95
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Mon Oct 30 18:16:26 2017 +0800
+
+    add class MapMaker,TEST UnProject method of ATANCamera
+
+commit f85078dd29976fa2e8f53ad3b57b00b3c6dd0f92
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Mon Oct 30 12:38:07 2017 +0800
+
+    change order of including header files
+
+commit 7e360e795f16690b77653dff76c5db4677c55bc9
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Mon Oct 30 12:06:40 2017 +0800
+
+    use cv::Pointi instead of cv::Pointf for most cv::PointX type points
+
+commit 30c4da0ae4e6abc64f4e3e3ce70aa6bc7fe3329e
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Mon Oct 30 11:48:55 2017 +0800
+
+    test MiniPatch::SSDAtPoint, use cv::Pointi instead of cv::Pointf in SSDAtPoint to solve its problem
+
+commit 52e4bfa41d29929e66175ebf509efa0292e15ced
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Fri Oct 27 16:20:16 2017 +0800
+
+    optimize code structure...
+
+commit 409442da136ca60eab3ac280ac5ada72ba27329b
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Thu Oct 26 19:54:32 2017 +0800
+
+    add <html>
+
+commit a0962b4a77e644d577a507cedb6b11fa012ee104
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Thu Oct 26 19:39:04 2017 +0800
+
+    use MathJax.js script to display LaTex on GitHub
+
+commit 11c999461a4c15548c7231f1708f7dd55a58563e
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Thu Oct 26 19:28:45 2017 +0800
+
+    add Shi-Tomas and Camera project and unproject
+
+commit 456156eda2748ca55b28a5c0823f5486e3ddd523
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Thu Oct 26 14:57:17 2017 +0800
+
+    add class Feature2dDetector and method HalfSample
+
+commit 2ebde9256584063cc3dff6db3052f7c78fa191ac
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Thu Oct 26 14:24:36 2017 +0800
+
+    add class ATANCamera
+
+commit 578c73c96163eb0d64c2e464862414673e9d90be
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Wed Oct 25 18:50:11 2017 +0800
+
+    build with Release type
+
+commit 669200a1a08b8ef639247f4949c91ab5b4ba8e7b
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Wed Oct 25 18:49:29 2017 +0800
+
+    add ssd, patch match, FAST, .etc
+
+commit 4a70f5f5c6e4659ae44c43eff1f591f47ee98fa3
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Wed Oct 25 18:48:12 2017 +0800
+
+    deleted MiniPatch.h
+
+commit 2fda3e3583ee2fcf33d468b87463784444e13153
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Wed Oct 25 18:47:29 2017 +0800
+
+    image.at<double> to image.at<uchar>, add option of non-maximal suppression into DetectFASTCorners method
+
+commit e86eb7a57487b0d85784cf311b1ed49d7db91e96
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Wed Oct 25 18:41:00 2017 +0800
+
+    add TEST for FindShiTomasiScoreAtPoint
+
+commit f505ad28a8324c890c2daab278be2aec064cdcc3
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Wed Oct 25 18:39:47 2017 +0800
+
+    display gray image on gl window
+
+commit d63e64ed966cc8f92ba017c6bb859cc5422d605d
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Wed Oct 25 10:22:37 2017 +0800
+
+    add method TrailTracking_Start&TrailTracking_Advance, use #ifdef and #endif
+
+commit bab21aac0f3728e32a76f0b47db3b24f72d5afae
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Tue Oct 24 16:44:44 2017 +0800
+
+    add class MiniPatch,include SSDAtPoint and FindPatch
+
+commit 16bf7d4da847b13455b0c21eb864a88610e117c0
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Tue Oct 24 14:27:56 2017 +0800
+
+    add class ImgProc,KeyFrame,Tracker and GLWindowPangolin
+
+commit 82b5bd70348366a93a272b97fe455bfc5f4a5742
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Mon Oct 23 11:43:38 2017 +0800
+
+    add and use googletest
+
+commit 4b458709095bff4e83661673dee957add569e497
+Author: GaoHongchen <1656738573@qq.com>
+Date:   Fri Oct 20 20:13:41 2017 +0800
+
+    new project
+
+commit 4ddc43e98fd16e4554d66d4cf0cd96b4bf4be3b1
+Author: Gordon Scott <1656738573@qq.com>
+Date:   Fri Oct 20 07:11:08 2017 -0500
+
+    Initial commit
