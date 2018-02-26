@@ -6,7 +6,7 @@
 
 #include "Common.h"
 
-int Homography::Compute(const std::vector<HomographyMatch> &vMatches, Sophus::SE3 &se3SecondFromFirst, double dMaxPixelError)
+int Homography::Compute(const std::vector<HomographyMatch> &vMatches, Sophus::SE3<double> &se3SecondFromFirst, double dMaxPixelError)
 {
     mdMaxPixelErrorSquared = dMaxPixelError * dMaxPixelError;
 
@@ -284,7 +284,7 @@ int Homography::DecomposeHomography(const Eigen::Matrix3d &m3Homography, std::ve
         Eigen::Matrix3d m3Rotation = s * U * vHomographyDecompositions[i].m3Rp * V.transpose();
         Eigen::Vector3d v3Translation =  U * vHomographyDecompositions[i].v3Tp;
 
-        Sophus::SE3 se3SecondFromFirst;
+        Sophus::SE3<double> se3SecondFromFirst;
         se3SecondFromFirst.setRotationMatrix(m3Rotation);
         se3SecondFromFirst.translation() = v3Translation;
 
@@ -353,11 +353,11 @@ int Homography::ChooseBestDecomposition(
         double adSampsonusScores[2];
         for(int i=0; i<2; i++)
         {
-            Sophus::SE3 se3 = vHomographyDecompositions[i].se3SecondFromFirst;
+            Sophus::SE3<double> se3 = vHomographyDecompositions[i].se3SecondFromFirst;
             Eigen::Matrix3d m3Essential;
             for(int j=0; j<3; j++)
             {
-                m3Essential.col(j) = se3.translation().cross(se3.rotation_matrix().col(j));
+                m3Essential.col(j) = se3.translation().cross(se3.rotationMatrix().col(j));
             }
             double dSumError = 0;
             for(unsigned int m=0; m<vMatches.size(); ++m)

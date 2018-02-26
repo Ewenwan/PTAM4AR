@@ -1,7 +1,7 @@
 #ifndef __MapMaker_H
 #define __MapMaker_H
 
-#include <sophus/se3.h>
+#include <sophus/se3.hpp>
 
 #include "ATANCamera.h"
 #include "KeyFrame.h"
@@ -15,7 +15,7 @@ public:
     bool InitFromStereo(KeyFrame &kFirst,
                         KeyFrame &kSecond,
                         std::vector<std::pair<cv::Point2i, cv::Point2i> > &vTrailMatches,
-                        Sophus::SE3 &se3CameraPos);
+                        Sophus::SE3<double> &se3CameraPos);
 
 private:
     ATANCamera mCamera;

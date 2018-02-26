@@ -2,7 +2,7 @@
 #define __MathUtility_H
 
 #include <Eigen/Core>
-#include <sophus/se3.h>
+#include <sophus/se3.hpp>
 
 namespace cg {
 
@@ -25,7 +25,7 @@ public:
     }
 
     // Finds 3d coords of point in reference frame B from two z=1 plane projections
-    inline static Eigen::Vector3d Triangulate(const Sophus::SE3 &se3AfromB, const Eigen::Vector2d &v2A, const Eigen::Vector2d &v2B)
+    inline static Eigen::Vector3d Triangulate(const Sophus::SE3<double> &se3AfromB, const Eigen::Vector2d &v2A, const Eigen::Vector2d &v2B)
     {
         Eigen::Matrix4d PDash = se3AfromB.matrix();
 

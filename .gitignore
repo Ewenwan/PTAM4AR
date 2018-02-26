@@ -77,3 +77,4 @@ build-PTAM-GS-Desktop-Default/
 
 .idea/
 *-build-*
+build/

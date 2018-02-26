@@ -15,8 +15,8 @@ System::System()
 {
     mpJsonConfig = new JsonConfig("../Config.json");
     mpPangolinWindow = new GLWindowPangolin("PTAM-GS",GS::Size(640,480));
-    mpVideoSource = new ImageDataSet("/home/gordon/projects/PTAM4AR/data/rgbd_dataset_freiburg1_xyz",
-                                       "/home/gordon/projects/PTAM4AR/data/rgbd_dataset_freiburg1_xyz/associate.txt");
+    mpVideoSource = new ImageDataSet("/home/chenguang/projects/datasets/rgbd_dataset_freiburg1_xyz",
+                                       "/home/chenguang/projects/datasets/rgbd_dataset_freiburg1_xyz/associate.txt");
     mpCamera = new ATANCamera();
     mpMapMaker = new MapMaker(*mpCamera);
     mpTracker = new Tracker(mpJsonConfig, mpPangolinWindow, *mpMapMaker);
@@ -32,8 +32,10 @@ void System::Run()
     cv::Mat imgRGB,imgBW;
     while(!mbDone)
     {
-        if(GS::RET_FAILED == mpVideoSource->GetFrameRGBBW(imgRGB,imgBW))
+        if(GS::RET_FAILED == mpVideoSource->GetFrameRGBBW(imgRGB,imgBW)) {
+            std::cerr << "mpVideoSource->GetFrameRGBBW failed !!!" << std::endl;
             break;
+        }
 
         mpPangolinWindow->SetupViewport();
         mpPangolinWindow->SetupVideoOrtho();

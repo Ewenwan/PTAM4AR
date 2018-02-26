@@ -25,7 +25,7 @@ MapMaker::MapMaker(const ATANCamera &cam):
 bool MapMaker::InitFromStereo(
         KeyFrame &kFirst, KeyFrame &kSecond,
         std::vector<std::pair<cv::Point2i, cv::Point2i> > &vTrailMatches,
-        Sophus::SE3 &se3CameraPos)
+        Sophus::SE3<double> &se3CameraPos)
 {
     mdWiggleScale = 0.1;
 
@@ -56,7 +56,7 @@ bool MapMaker::InitFromStereo(
     }
 
     Homography homo;
-    Sophus::SE3 se3_homo;
+    Sophus::SE3<double> se3_homo;
     if(GS::RET_FAILED == homo.Compute(vMatches,se3_homo))
         return false;
 

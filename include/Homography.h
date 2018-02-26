@@ -3,7 +3,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <sophus/se3.h>
+#include <sophus/se3.hpp>
 
 class Homography
 {
@@ -24,12 +24,12 @@ public:
         double d;
 
         // The resolved composition
-        Sophus::SE3 se3SecondFromFirst;
+        Sophus::SE3<double> se3SecondFromFirst;
         int nScore;
     };
 
 public:
-    int Compute(const std::vector<HomographyMatch> &vMatches, Sophus::SE3 &se3SecondFromFirst, double dMaxPixelError=1.0);
+    int Compute(const std::vector<HomographyMatch> &vMatches, Sophus::SE3<double> &se3SecondFromFirst, double dMaxPixelError=1.0);
 
 public:
     double mdMaxPixelErrorSquared;

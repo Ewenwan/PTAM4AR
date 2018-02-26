@@ -1,5 +1,5 @@
-project(PTAM-GS)
-cmake_minimum_required(VERSION 2.8)
+project(PTAM-CG)
+cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -std=c++11 -O3 -Wall -g")
@@ -7,35 +7,41 @@ set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -std=c++11 -O3 -Wall -g")
 ################ Dependencies ################
 
 # OpenCV
-find_package( OpenCV REQUIRED COMPONENTS opencv_core opencv_imgcodecs opencv_imgproc opencv_features2d opencv_calib3d)
-if(OpenCV_FOUND)
+set( OpenCV_DIR "/opt/opencv_320_r/share/OpenCV" )
+find_package( OpenCV REQUIRED COMPONENTS opencv_core opencv_imgcodecs opencv_imgproc opencv_highgui opencv_features2d opencv_calib3d)
+if( OpenCV_FOUND )
     include_directories( ${OpenCV_INCLUDE_DIRS} )
     link_libraries( ${OpenCV_LIBS} )
 endif()
 
-# Sophus
-find_package( Sophus REQUIRED )
-if(Sophus_FOUND)
-    include_directories( ${Sophus_INCLUDE_DIRS} )
-    link_libraries( ${Sophus_LIBRARIES} Sophus )
-endif()
-
 # GLEW
-find_package(GLEW REQUIRED)
-if (GLEW_FOUND)
-    include_directories(${GLEW_INCLUDE_DIRS})
-    link_libraries(${GLEW_LIBRARIES})
+find_package( GLEW REQUIRED )
+if ( GLEW_FOUND )
+    include_directories( ${GLEW_INCLUDE_DIRS} )
+    link_libraries( ${GLEW_LIBRARIES} )
 endif()
 
 # Pangolin
 find_package( Pangolin )
-if(Pangolin_FOUND)
+if( Pangolin_FOUND )
     include_directories( ${Pangolin_INCLUDE_DIRS} )
     link_libraries( ${Pangolin_LIBRARIES} )
 endif()
 
+# Sophus
+find_package( Sophus REQUIRED sophus )
+if( Sophus_FOUND )
+    include_directories( /opt/Sophus/include/ )
+endif()
+
 ## JsonCpp
-link_libraries(jsoncpp)
+find_package( PkgConfig )
+pkg_check_modules( JSONCPP REQUIRED jsoncpp )
+if ( JSONCPP_FOUND )
+    include_directories( /opt/jsoncpp/include )
+    link_libraries( ${JSONCPP_LIBRARIES} )
+endif ()
+
 
 ################ PTAM-GS ################
 include_directories(${PROJECT_SOURCE_DIR}/include)

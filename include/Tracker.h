@@ -6,7 +6,7 @@
 #include "KeyFrame.h"
 
 #include <list>
-#include <sophus/se3.h>
+#include <sophus/se3.hpp>
 
 class JsonConfig;
 class GLWindowPangolin;
@@ -39,7 +39,7 @@ private:
     JsonConfig *mpJsonConfig;
     GLWindowPangolin *mpPangolinWindow;
     MapMaker &mMapMaker;
-    Sophus::SE3 mse3CamFromWorld;
+    Sophus::SE3<double> mse3CamFromWorld;
 
     void TrackForInitialMap();
     void TrailTracking_Start();
