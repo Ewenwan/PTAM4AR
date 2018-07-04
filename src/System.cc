@@ -99,7 +99,10 @@ void System::UpdateFrame(Image<byte> imBW, Image<Rgb<byte> > imRGB)
     bool bDrawMap = mpMap->IsGood() && *gvnDrawMap;
     bool bDrawAR = mpMap->IsGood() && *gvnDrawAR;
 // 5. 开始追踪黑白图像(相机位姿跟踪)
+    // 多层级金字塔图像(多金字塔尺度) FAST角点检测匹配跟踪
+    // 每一个层级的阈值有所不同。最后生成按列角点查询表，便于以后近邻角点的查询任务.
     mpTracker->TrackFrame(imBW, !bDrawAR && !bDrawMap);
+    
 // 6. 可视化显示
     if(bDrawMap)
         mpMapViewer->DrawMap(mpTracker->GetCurrentPose());// 显示地图点云
