@@ -1,6 +1,6 @@
 // Copyright 2008 Isis Innovation Limited
 // This is the main extry point for PTAM
-
+// 系统入口main函数
 #include <stdlib.h>
 #include <iostream>
 
