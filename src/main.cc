@@ -18,16 +18,16 @@ int main()
     cout << endl;
 
     cout << "  Parsing settings.cfg ...." << endl;
-    GUI.LoadFile("../config/settings.cfg");
-    GUI.StartParserThread(); // Start parsing of the console input
+    GUI.LoadFile("../config/settings.cfg");// 载入相机参数等配置文件
+    GUI.StartParserThread(); // 用户界面线程启动 Start parsing of the console input
     atexit(GUI.StopParserThread);
 
     try
     {
-        System s;
-        s.Run();
+        System s;// 创建系统对象
+        s.Run();// 运行
     }
-    catch(CVD::Exceptions::All e)
+    catch(CVD::Exceptions::All e)// 异常状态捕获
     {
         cout << endl;
         cout << "!! Failed to run system; got exception. " << endl;
