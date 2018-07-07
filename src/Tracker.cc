@@ -1,5 +1,8 @@
 // Copyright 2008 Isis Innovation Limited
 
+// 跟踪线程
+
+
 #include "Tracker.h"
 
 #include <fstream>
@@ -40,12 +43,13 @@ Tracker::Tracker(ImageRef irVideoSize, const ATANCamera &c, Map &m, MapMaker &mm
     mpSBIThisFrame = nullptr;
 
     // Most of the initialisation is done in Reset()
-    Reset();
+    Reset();// 重置 复原
 }
 
 // Resets the tracker, wipes the map.
 // This is the main Reset-handler-entry-point of the program! Other classes' resets propagate from here.
 // It's always called in the Tracker's thread, often as a GUI command.
+// 重置 复原
 void Tracker::Reset()
 {
     mbDidCoarse = false;
@@ -87,10 +91,11 @@ void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
 {
     mbDraw = bDraw;
     mMessageForUser.str("");
-
+// 步骤1： 预处理，为当前关键帧生成4级金字塔图像(多尺度金字塔)，进行FAST角点检测，生成角点查找表
     mCurrentKF.mMeasurements.clear();
     mCurrentKF.MakeKeyFrame_Lite(imFrame);// This does things like generate the image pyramid and find FAST corners
-
+    
+// 步骤2：更新小图，为估计旋转矩阵做准备
     // Update the small images for the rotation estimator
     static gvar3<double> gvdSBIBlur("Tracker.RotationEstimatorBlur", 0.75, SILENT);
     static gvar3<int> gvnUseSBI("Tracker.UseRotationEstimator", 1, SILENT);
@@ -109,45 +114,56 @@ void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
 
     // From now on we only use the keyframe struct!
     mnFrame++;
-
+    
+// 步骤3：显示图像和角点==============================================
     if(mbDraw)
-    {
+    {   // 显示第0层的图像
         glDrawPixels(mCurrentKF.aLevels[0].im);
+        // 显示FAST角点
         if(GV2.GetInt("Tracker.DrawFASTCorners",0, SILENT))
         {
             glColor3f(1,0,1);
             glPointSize(1);
             glBegin(GL_POINTS);
             for (const auto &vCorner : mCurrentKF.aLevels[0].vCorners)
-                glVertex(vCorner);
+                glVertex(vCorner);// 显示角点
             glEnd();
         }
     }
-
-    if(mMap.IsGood())
+//  步骤4：从粗到细两轮求解，估计相机运动==============================================
+    if(mMap.IsGood())// 地图状态好
     {
+     // 更新情况良好
         if(mnLostFrames < 3)
         {
+            // 1. 运动模型跟踪上一帧
             PredictPoseWithMotionModel();
+            // 2. 跟踪地图
             TrackMap();
+            // 3. 更新运动模型(前后两帧变换矩阵)
             UpdateMotionModel();
-
+            // 4. 确保跟踪质量
             AssessTrackingQuality();
+            
+            // 5. 显示更新系统跟踪状态信息(跟踪质量好坏 每一层fast角点熟练 地图点和关键帧数量)
             {
                 mMessageForUser << "Tracking Map, quality ";
+                // 跟踪质量好坏
                 if(mTrackingQuality == GOOD)  mMessageForUser << "good.";
                 if(mTrackingQuality == BAD)   mMessageForUser << "bad.";
                 mMessageForUser << " Found:";
-                for(int i=0; i<LEVELS; i++)
+                for(int i=0; i<LEVELS; i++)// 每一层角点数量？
                     mMessageForUser << " " << manMeasFound[i] << "/" << manMeasAttempted[i];
+                // 地图点数量和关键帧数量
                 mMessageForUser << " Map: " << mMap.vpPoints.size() << "P, " << mMap.vpKeyFrames.size() << "KF";
             }
 
-            bool isTrackGood = mTrackingQuality == GOOD;
-            bool isNeedFrame = mMapMaker.IsNeedNewKeyFrame(mCurrentKF);
-            bool isFarEnough = mnFrame - mnLastKeyFrameDropped > 20;
-            bool isQueueNeed = mMapMaker.QueueSize() < 3;
-
+            bool isTrackGood = mTrackingQuality == GOOD;// 跟踪质量标志
+            bool isNeedFrame = mMapMaker.IsNeedNewKeyFrame(mCurrentKF);//是否需要创建关键帧
+            bool isFarEnough = mnFrame - mnLastKeyFrameDropped > 20;// 时间上是否过去很长时间
+            bool isQueueNeed = mMapMaker.QueueSize() < 3;// 
+            
+            // 更新标志
             if(isTrackGood)
                 mMessageForUser << " 1";
             if(isNeedFrame)
@@ -156,27 +172,29 @@ void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
                 mMessageForUser << " 3";
             if(isQueueNeed)
                 mMessageForUser << " 4";
-
+            //  6. 关键帧判断即创建关键帧
             // Heuristics to check if a key-frame should be added to the map:
             if( isTrackGood &&  isFarEnough && isQueueNeed )//isNeedFrame
             {
                 mMessageForUser << " Adding key-frame.";
-                mMapMaker.AddKeyFrame(mCurrentKF);
+                mMapMaker.AddKeyFrame(mCurrentKF);// 创建关键帧
                 mnLastKeyFrameDropped = mnFrame;
             }
         }
+    // 7. 跟踪丢失的处理--类似重定位处理
         else  // what if there is a map, but tracking has been lost?
         {
             mMessageForUser << "** Attempting recovery **.";
             if(AttemptRecovery())
             {
-                TrackMap();
-                AssessTrackingQuality();
+                TrackMap();// 跟踪地图，重新定位
+                AssessTrackingQuality();//确保跟踪质量
             }
         }
         if(mbDraw)
             RenderGrid();
     }
+   // 地图不好，跟踪初始地图
     else
         TrackForInitialMap();
 
@@ -193,6 +211,7 @@ void Tracker::TrackFrame(Image<byte> &imFrame, bool bDraw)
 // it has no idea where it is, so graphics will go a bit 
 // crazy when lost. Could use a tighter SSD threshold and return more false,
 // but the way it is now gives a snappier response and I prefer it.
+// 跟踪丢失的处理--类似重定位处理-预处理 恢复
 bool Tracker::AttemptRecovery()
 {
     bool bRelocGood = mRelocaliser.AttemptRecovery(mCurrentKF);
@@ -307,6 +326,7 @@ void Tracker::GUICommandHandler(string sCommand, string sParams)  // Called by t
  *        using cheap frame-to-frame tracking (which is very brittle - quick camera motion will
  *        break it.) The salient points are stored in a list of `Trail' data structures.
  *        What action TrackForInitialMap() takes depends on the mnInitialStage enum variable..
+ * 起初地图质量不好(点比较少)，初始地图跟踪
  */
 void Tracker::TrackForInitialMap()
 {
@@ -315,7 +335,7 @@ void Tracker::TrackForInitialMap()
         if(mbUserPressedSpacebar)  // First spacebar = this is the first keyframe
         {
             mbUserPressedSpacebar = false;
-            TrailTracking_Start();
+            TrailTracking_Start();// 第一帧
             mnInitialStage = TRAIL_TRACKING_STARTED;
         }
         else
@@ -348,6 +368,7 @@ void Tracker::TrackForInitialMap()
 
 /**
  * @brief The current frame is to be the first keyframe!
+ *  起初地图质量不好(点比较少)，初始地图跟踪
  */
 void Tracker::TrailTracking_Start()
 {
@@ -431,9 +452,10 @@ int Tracker::TrailTracking_Advance()
     return nGoodTrails;
 }
 
-/**
+/** 跟踪地图  最重要的部分
  * @details TrackMap is the main purpose of the Tracker.
  *          1) It first projects all map points into the image to find a potentially-visible-set (PVS);
+ *                将地图点根据帧初始位姿投影到帧的二维图像平面上(寻找 可能的匹配集合) 
  *          2) Then it tries to find some points of the PVS in the image;
  *          3) Then it updates camera pose according to any points found.
  *          4) Above may happen twice if a coarse tracking stage is performed.
@@ -443,29 +465,30 @@ void Tracker::TrackMap()
 {
     // Some accounting which will be used for tracking quality assessment:
     for(int i=0; i<LEVELS; i++)
+        // 匹配点记录信息，来判断跟踪质量好坏
         manMeasAttempted[i] = manMeasFound[i] = 0;
 
     // The Potentially-Visible-Set (PVS) is split into pyramid levels.
     vector<TrackerData*> avPVS[LEVELS];
     for (auto &i : avPVS)
-        i.reserve(500);
+        i.reserve(500);// 每一层可能的匹配集合
 
-    // For all points in the map..
+// 遍历地图中所有的地图点 For all points in the map..
     for (auto &vpPoint : mMap.vpPoints) {
         MapPoint &p= *vpPoint;
         // Ensure that this map point has an associated TrackerData struct.
         if(!p.pTData)
             p.pTData = new TrackerData(&p);
         TrackerData &TData = *p.pTData;
-
+// 1. 将地图点根据帧初始位姿和相机参数投影到帧的二维图像平面上，跳过不在相机平面上的点
         // Project according to current view, and if it's not in the image, skip.
         TData.Project(mse3CamFromWorld, mCamera);
         if(!TData.bInImage)
             continue;
 
         // Calculate camera projection derivatives of this point.
-        TData.m2CamDerivs = mCamera.GetProjectionDerivs();
-
+        TData.m2CamDerivs = mCamera.GetProjectionDerivs();// 计算投影点
+// 计算投影点处 patch 匹配
         // And check what the PatchFinder (included in TrackerData) makes of the mappoint in this view..
         TData.nSearchLevel = TData.Finder.CalcSearchLevelAndWarpMatrix(TData.Point, mse3CamFromWorld, TData.m2CamDerivs);
         if(TData.nSearchLevel == -1)
@@ -490,7 +513,7 @@ void Tracker::TrackMap()
     // Tunable parameters to do with the coarse tracking stage:
     static gvar3<unsigned int> gvnCoarseMin("Tracker.CoarseMin", 20, SILENT);   // Min number of large-scale features for coarse stage
     static gvar3<unsigned int> gvnCoarseMax("Tracker.CoarseMax", 60, SILENT);   // Max number of large-scale features for coarse stage
-    static gvar3<unsigned int> gvnCoarseRange("Tracker.CoarseRange", 30, SILENT);       // Pixel search radius for coarse features
+    static gvar3<unsigned int> gvnCoarseRange("Tracker.CoarseRange", 30, SILENT); // Pixel search radius for coarse features
     static gvar3<int> gvnCoarseSubPixIts("Tracker.CoarseSubPixIts", 8, SILENT); // Max sub-pixel iterations for coarse features
     static gvar3<int> gvnCoarseDisabled("Tracker.DisableCoarse", 0, SILENT);    // Set this to 1 to disable coarse stage (except after recovery)
     static gvar3<double> gvdCoarseMinVel("Tracker.CoarseMinVelocity", 0.006, SILENT);  // Speed above which coarse stage is used.
@@ -635,7 +658,8 @@ void Tracker::TrackMap()
 
         // Again, an M-Estimator hack beyond the fifth iteration.
         double dOverrideSigma = iter > 5 ? 16.0 : 0.0;
-
+        
+        // 3d-2d匹配点求解位姿
         // Calculate and update pose; also store update vector for linear iteration updates.
         Vector<6> v6Update = CalcPoseUpdate(vIterationSet, dOverrideSigma, iter == 9);
         mse3CamFromWorld = SE3<>::exp(v6Update) * mse3CamFromWorld;
@@ -1008,11 +1032,12 @@ Vector<6> Tracker::CalcPoseUpdate(vector<TrackerData*> vTD, double dOverrideSigm
  * @brief Just add the current velocity to the current pose.
  *        N.b. this doesn't actually use time in any way,i.e. it assumes a one-frame-per-second camera.
  *        Skipped frames etc are not handled properly here.
+ * 运动模式跟踪上一帧
  */
 void Tracker::PredictPoseWithMotionModel()
 {
     mse3StartPos = mse3CamFromWorld;
-    Vector<6> v6Velocity = mv6CameraVelocity;
+    Vector<6> v6Velocity = mv6CameraVelocity;// 运动速度(两帧之间的位姿差)
     if(mbUseSBIInit)
     {
         mpSBILastFrame->MakeJacs(mpSBILastFrame->mimTemplate, mpSBILastFrame->mimImageJacs);
@@ -1031,6 +1056,7 @@ void Tracker::PredictPoseWithMotionModel()
 /**
  * @brief The motion model is entirely the tracker's, and is kept as
  *        a decaying constant velocity model.
+ * 更新运动模型
  */
 void Tracker::UpdateMotionModel()
 {
@@ -1051,7 +1077,7 @@ void Tracker::UpdateMotionModel()
     // This is used to decide if we should use a coarse tracking stage.
     // We can tolerate more translational vel when far away from scene!
     Vector<6> v6 = mv6CameraVelocity;
-    v6.slice<0,3>() *= 1.0 / mCurrentKF.dSceneDepthMean;
+    v6.slice<0,3>() *= 1.0 / mCurrentKF.dSceneDepthMean;// 归一化
     mdMSDScaledVelocityMagnitude = sqrt(v6*v6);
 }
 
@@ -1112,11 +1138,5 @@ string Tracker::GetMessageForUser()
 }
 
 ImageRef TrackerData::irImageSize;  // Static member of TrackerData lives here
-
-
-
-
-
-
 
 
