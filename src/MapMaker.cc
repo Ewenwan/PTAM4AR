@@ -82,30 +82,30 @@ void MapMaker::run()
         // From here on, mapmaker does various map-maintenance jobs in a certain priority
         // Hierarchy. For example, if there's a new key-frame to be added (QueueSize() is >0)
         // then that takes high priority.
-
+// 步骤1. 局部地图优化
         CHECK_RESET;
         // Should we run local bundle adjustment?
         if(!mbBundleConverged_Recent && QueueSize() == 0)
             BundleAdjustRecent();
-
+// 步骤2. 地图点投影到关键帧，无匹配到的角点，创建新的地图点
         CHECK_RESET;
         // Are there any newly-made map points which need more measurements from older key-frames?
         if(mbBundleConverged_Recent && QueueSize() == 0)
             ReFindNewlyMade();
-
+// 步骤3. 全局地图优化
         CHECK_RESET;
         // Run global bundle adjustment?
         if(mbBundleConverged_Recent && !mbBundleConverged_Full && QueueSize() == 0)
             BundleAdjustAll();
-
+// 步骤4. 查找外点
         CHECK_RESET;
         // Very low priorty: re-find measurements marked as outliers
         if(mbBundleConverged_Recent && mbBundleConverged_Full && rand()%20 == 0 && QueueSize() == 0)
             ReFindFromFailureQueue();
-
+// 步骤5. 处理外点
         CHECK_RESET;
         HandleBadPoints();
-
+// 步骤6. 添加关键帧
         CHECK_RESET;
         // Any new key-frames to be added?
         if(QueueSize() > 0)
@@ -124,7 +124,7 @@ bool MapMaker::ResetDone()
     return mbResetDone;
 }
 
-/**
+/** 步骤5. 处理外点
  * @brief Does some heuristic checks on all points in the map to see if
  *        they should be flagged as bad, based on tracker feedback.
  */
@@ -152,6 +152,7 @@ void MapMaker::HandleBadPoints()
     mMap.MoveBadPointsToTrash();
 }
 
+// 对象析构函数
 MapMaker::~MapMaker()
 {
     mbBundleAbortRequested = true;
@@ -1259,15 +1260,4 @@ void MapMaker::GUICommandHandler(string sCommand, string sParams)  // Called by 
     cout << "! MapMaker::GUICommandHandler: unhandled command "<< sCommand << endl;
     exit(1);
 }
-
-
-
-
-
-
-
-
-
-
-
 
